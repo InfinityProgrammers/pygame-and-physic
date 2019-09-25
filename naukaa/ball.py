@@ -28,8 +28,8 @@ shoot = False
 bound = False
 gravacc = 0.04
 vel = Vector2(0, 0)
-times1 = 1
-times2 = 1
+times1 = 1.2
+times2 = 1.1
 while True:
     golfball.delta += golfball.clock.tick()/ 1000.0
     pos = pygame.mouse.get_pos()
@@ -42,10 +42,8 @@ while True:
             golfball.y += vel.y
             vel.y += gravacc
             if golfball.y > 394:
-                times1+=0.6
-                times2+=0.2
-                vel.x = round(math.cos(math.radians(angle)) * power) / (12*times2)
-                vel.y = -round(math.sin(math.radians(angle)) * power) / (12 * times1)
+                vel.x /= times2
+                vel.y /= -times1
                 vel.y += gravacc
                 golfball.x += vel.x
                 golfball.y += vel.y
@@ -54,8 +52,8 @@ while True:
                     golfball.y = 394
                     shoot = False
                     bound = False
-                    times1 = 1
-                    times2 = 1
+                    times1 = 1.2
+                    times2 = 1.1
             elif golfball.y < 0:    #odbicie od 'sufitu'
                 vel.y = -vel.y
                 vel.y += gravacc
