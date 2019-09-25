@@ -56,6 +56,13 @@ while True:
                     bound = False
                     times1 = 1
                     times2 = 1
+            elif golfball.y < 0:    #odbicie od 'sufitu'
+                vel.y = -vel.y
+                vel.y += gravacc
+                golfball.y += vel.y
+            if golfball.x < 0 or golfball.x > 800:  #odbicie od 'sciany'
+                vel.x = -vel.x
+                golfball.x+=vel.x
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
