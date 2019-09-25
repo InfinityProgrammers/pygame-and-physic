@@ -25,10 +25,11 @@ def redrawwindow():
 
 golfball = pilka(400, 394, 6, (255, 255, 255))
 shoot = False
+bound = False
 gravacc = 0.04
 vel = Vector2(0, 0)
-
-
+times1 = 1
+times2 = 1
 while True:
     golfball.delta += golfball.clock.tick()/ 1000.0
     pos = pygame.mouse.get_pos()
@@ -37,13 +38,24 @@ while True:
     while golfball.delta > 1/golfball.tickrate:
         golfball.delta -= 1/golfball.tickrate
         if shoot:
+            golfball.x += vel.x
+            golfball.y += vel.y
+            vel.y += gravacc
             if golfball.y > 394:
-                golfball.y = 394
-                shoot = False
-            else:
+                times1+=0.6
+                times2+=0.2
+                vel.x = round(math.cos(math.radians(angle)) * power) / (12*times2)
+                vel.y = -round(math.sin(math.radians(angle)) * power) / (12 * times1)
+                vel.y += gravacc
                 golfball.x += vel.x
                 golfball.y += vel.y
-                vel.y += gravacc
+                bound = True
+                if abs(vel.x) < 0.1 and bound and abs(vel.y) < 0.2:
+                    golfball.y = 394
+                    shoot = False
+                    bound = False
+                    times1 = 1
+                    times2 = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -51,13 +63,9 @@ while True:
                 if shoot == False:
                     shoot = True
                     posss = pygame.mouse.get_pos()
-                    print(posss)
                     poss = Vector2(posss[0] - golfball.x, posss[1] - golfball.y)
-                    x = golfball.x
-                    y = golfball.y
                     power = math.sqrt((golfball.x-posss[0])**2+(golfball.y-posss[1])**2)/3
                     angle = poss.angle_to(Vector2(1, 0))
-                    print(angle)
                     vel.x = round(math.cos(math.radians(angle)) * power) / 12
                     vel.y = -round(math.sin(math.radians(angle)) * power) / 12
 
