@@ -49,8 +49,6 @@ while True:
                 if abs(vel.x) < 0.1 and abs(vel.y) < 0.1:
                     golfball.y = 394
                     shoot = False
-                    times1 = 1
-                    times2 = 1
             if golfball.x < 6 or golfball.x > 794:
                 vel.x /= -1.2
                 golfball.x += vel.x
