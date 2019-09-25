@@ -61,6 +61,3 @@ while True:
                     vel.x = round(math.cos(math.radians(angle)) * power) / 12
                     vel.y = -round(math.sin(math.radians(angle)) * power) / 12
 
-
-
-
