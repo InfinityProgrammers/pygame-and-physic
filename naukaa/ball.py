@@ -7,7 +7,7 @@ class pilka(object):
     def __init__(self, x, y, radius, color):
         self.clock = pygame.time.Clock()
         self.delta = 0
-        self.tickrate = 10
+        self.tickrate = 120
         self.x = x
         self.y = y
         self.radius = radius
@@ -24,50 +24,42 @@ def redrawwindow():
     pygame.display.update()
 
 golfball = pilka(400, 394, 6, (255, 255, 255))
-
-
-x = 0
-y = 0
-time = 0
-power = 0
-angle = 0
 shoot = False
+gravacc = 0.04
 vel = Vector2(0, 0)
-gravacc = Vector2(0, 0)
 
 
 while True:
-    print(angle)
     golfball.delta += golfball.clock.tick()/ 1000.0
+    pos = pygame.mouse.get_pos()
+    line = [(golfball.x, golfball.y), pos]
+    redrawwindow()
     while golfball.delta > 1/golfball.tickrate:
         golfball.delta -= 1/golfball.tickrate
         if shoot:
-            print("leci")
-            if angle > 90:
-                vel.x -= round(math.sin(angle) * power)
-                vel.y -= round(math.cos(angle) * power)
-                golfball.x += vel.x
-                golfball.y += vel.y
+            if golfball.y > 394:
+                golfball.y = 394
+                shoot = False
             else:
-                vel.x += round(math.sin(angle)*power)
-                vel.y -= round(math.cos(angle)*power)
                 golfball.x += vel.x
                 golfball.y += vel.y
-        pos = pygame.mouse.get_pos()
-        poss = Vector2(pos[0]-golfball.x, pos[1]-golfball.y)
-        line = [(golfball.x, golfball.y), pos]
-        redrawwindow()
+                vel.y += gravacc
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if shoot == False:
                     shoot = True
-                    print("leci")
+                    posss = pygame.mouse.get_pos()
+                    print(posss)
+                    poss = Vector2(posss[0] - golfball.x, posss[1] - golfball.y)
                     x = golfball.x
                     y = golfball.y
-                    power = math.sqrt((line[1][0]-line[0][0])**2+(line[0][1]-line[1][1])**2)/8
+                    power = math.sqrt((golfball.x-posss[0])**2+(golfball.y-posss[1])**2)/3
                     angle = poss.angle_to(Vector2(1, 0))
+                    print(angle)
+                    vel.x = round(math.cos(math.radians(angle)) * power) / 12
+                    vel.y = -round(math.sin(math.radians(angle)) * power) / 12
 
 
 
