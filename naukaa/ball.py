@@ -24,12 +24,11 @@ def redrawwindow():
     pygame.display.update()
 
 golfball = pilka(400, 394, 6, (255, 255, 255))
-shoot = False
 bound = False
+shoot = False
 gravacc = 0.04
 vel = Vector2(0, 0)
-times1 = 1.2
-times2 = 1.1
+
 while True:
     golfball.delta += golfball.clock.tick()/ 1000.0
     pos = pygame.mouse.get_pos()
@@ -41,36 +40,31 @@ while True:
             golfball.x += vel.x
             golfball.y += vel.y
             vel.y += gravacc
-            if golfball.y > 394:
-                vel.x /= times2
-                vel.y /= -times1
+            if golfball.y > 394 or golfball.y < 6:
+                vel.x /= 1.2
+                vel.y /= -1.3
                 vel.y += gravacc
                 golfball.x += vel.x
                 golfball.y += vel.y
-                bound = True
-                if abs(vel.x) < 0.1 and bound and abs(vel.y) < 0.2:
+                if abs(vel.x) < 0.1 and abs(vel.y) < 0.1:
                     golfball.y = 394
                     shoot = False
-                    bound = False
-                    times1 = 1.2
-                    times2 = 1.1
-            elif golfball.y < 0:    #odbicie od 'sufitu'
-                vel.y = -vel.y
-                vel.y += gravacc
-                golfball.y += vel.y
-            if golfball.x < 0 or golfball.x > 800:  #odbicie od 'sciany'
-                vel.x = -vel.x
-                golfball.x+=vel.x
+                    times1 = 1
+                    times2 = 1
+            if golfball.x < 6 or golfball.x > 794:
+                vel.x /= -1.2
+                golfball.x += vel.x
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if shoot == False:
-                    shoot = True
-                    posss = pygame.mouse.get_pos()
-                    poss = Vector2(posss[0] - golfball.x, posss[1] - golfball.y)
-                    power = math.sqrt((golfball.x-posss[0])**2+(golfball.y-posss[1])**2)/3
-                    angle = poss.angle_to(Vector2(1, 0))
-                    vel.x = round(math.cos(math.radians(angle)) * power) / 12
-                    vel.y = -round(math.sin(math.radians(angle)) * power) / 12
-
+                    shoot= True
+                    times1 = 1
+                    times2 = 1
+                posss = pygame.mouse.get_pos()
+                poss = Vector2(posss[0] - golfball.x, posss[1] - golfball.y)
+                power = math.sqrt((golfball.x-posss[0])**2+(golfball.y-posss[1])**2)/3
+                angle = poss.angle_to(Vector2(1, 0))
+                vel.x = round(math.cos(math.radians(angle)) * power) / 12
+                vel.y = -round(math.sin(math.radians(angle)) * power) / 12
