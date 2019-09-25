@@ -60,8 +60,6 @@ while True:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if shoot == False:
                     shoot= True
-                    times1 = 1
-                    times2 = 1
                 posss = pygame.mouse.get_pos()
                 poss = Vector2(posss[0] - golfball.x, posss[1] - golfball.y)
                 power = math.sqrt((golfball.x-posss[0])**2+(golfball.y-posss[1])**2)/3
