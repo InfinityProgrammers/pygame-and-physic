@@ -2,17 +2,20 @@ import pygame, sys, math
 from pygame.math import Vector2
 
 win = pygame.display.set_mode((1024, 800))
-click = False
+
 clock = pygame.time.Clock()
 delta = 0
 tickrate = 60
-power = 0
+
+click = False
 space = False
 G = 6.674 * 10 ** (-18)
-poz = Vector2()
 power = 0
+
+poz = Vector2()
 vel = Vector2()
 pozycja = Vector2()
+
 pygame.init()
 class Cialo(object):
 
@@ -27,6 +30,7 @@ class Cialo(object):
     def Draw(self, win):
         pygame.draw.circle(win, (255, 100, 100), (int(self.x), int(self.y)), self.radius)
         pygame.draw.circle(win, (0, 100, 0), (int(self.x), int(self.y)), self.radius-2)
+
     def movement(self):
         self.vel += self.acc
         self.x += self.vel.x
@@ -37,6 +41,7 @@ def redraw():
     pilka.Draw(win)
     drawacc(pilka.x, pilka.y)
     drawspeed(pilka.x, pilka.y, pilka.vel.x, pilka.vel.y)
+
 def line(pos):
     pygame.draw.line(win, (255, 255, 255), [pilka.x, pilka.y], pos, 3)
 
@@ -62,7 +67,7 @@ def speed(power, accel, vel):
     vel.y = power*math.sin(angle)/4
     dlugosc = math.sqrt((vel.x) ** 2 + (vel.y) ** 2)
     ##if accel != 0:
-   ## if angle1 > 90:
+    ##if angle1 > 90:
     ##    vel = vel.rotate(angle1-90)
     pilka.x += vel.x
     pilka.y -= vel.y
