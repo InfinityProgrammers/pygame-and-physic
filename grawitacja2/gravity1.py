@@ -58,7 +58,7 @@ def drawspeed(x, y, xx, yy):
     if click and space:
         poz.x += xx+vel.x
         poz.y += yy-vel.y
-        pygame.draw.line(win, (255, 255, 255), (int(x),int(y)), poz, 2)
+        pygame.draw.line(win, (0, 0, 255), (int(x),int(y)), poz, 2)
 
 def speed(power, accel, vel):
     angle = pozycja.angle_to(Vector2(0,0))
