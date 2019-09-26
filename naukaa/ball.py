@@ -37,21 +37,19 @@ while True:
     while golfball.delta > 1/golfball.tickrate:
         golfball.delta -= 1/golfball.tickrate
         if shoot:
+            vel.y += gravacc
             golfball.x += vel.x
             golfball.y += vel.y
-            vel.y += gravacc
             if golfball.y > 394 or golfball.y < 6:
                 vel.x /= 1.2
                 vel.y /= -1.3
-                vel.y += gravacc
-                golfball.x += vel.x
-                golfball.y += vel.y
+                golfball.y = 6 if golfball.y<6 else 394
                 if abs(vel.x) < 0.1 and abs(vel.y) < 0.1:
                     golfball.y = 394
                     shoot = False
             if golfball.x < 6 or golfball.x > 794:
                 vel.x /= -1.2
-                golfball.x += vel.x
+                golfball.x = 6 if golfball.x<6 else 794
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
