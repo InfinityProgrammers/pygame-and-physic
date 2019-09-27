@@ -1,4 +1,5 @@
 import pygame, sys, math
+import config
 from pygame.math import Vector2
 
 win = pygame.display.set_mode((800, 400))
