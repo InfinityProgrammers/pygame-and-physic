@@ -43,27 +43,26 @@ class Cialo(object):
 
 def redraw(): #aktualizacja ekranu co tick
     win.fill((0, 0, 0))
+    pygame.draw.circle(win, (0, 128, 0), (512, 400), 100) #draw planet
     pilka.Draw(win)
-    drawacc(pilka.x, pilka.y, pilka.acc.x, pilka.acc.y)
-    drawspeed(pilka.x, pilka.y, pilka.vel.x, pilka.vel.y)
+    if click and space:
+        drawacc(pilka.x, pilka.y, pilka.acc.x, pilka.acc.y)
+        drawspeed(pilka.x, pilka.y, pilka.vel.x + vel.x, pilka.vel.y-vel.y)
     
 def line(pos): #drawing line
     pygame.draw.line(win, (255, 255, 255), [pilka.x, pilka.y], pos, 3)
 
 def drawacc(x, y, xx, yy): #drawing accelerate
-    if click and space:
-        pygame.draw.line(win, (255, 0, 0),(int(x), int(y)), ((xx*1000+pilka.x),(yy*1000+pilka.y)), 2)
+    pygame.draw.line(win, (255, 0, 0),(int(x), int(y)), ((xx*600+x),(yy*600+y)), 2)
 
 def drawspeed(x, y, xx, yy): #drawing velocity
-    if click and space:
-        pygame.draw.line(win, (255, 255, 255),(x, y), (xx*8+x, yy*8+y), 2)
+    pygame.draw.line(win, (50, 50, 255),(x, y), (xx*60/2+x, yy*60/2+y), 2)
 
 def planeta(): #planet variables
-    pygame.draw.circle(win, (0, 128, 0), (512, 400), 100)
     global mass_p
     mass_p = 5.972 * 10 ** 19
 
-def speed(power, vel): #manipulacja wektorem predkosci
+def speed(): #manipulacja wektorem predkosci
     angle4 = angleSpeed #kopiuje zmienną
     print(angleSpeed)
     angle4 = math.radians(angle4)
@@ -89,23 +88,24 @@ def Force(): #generowanie siły grawitacji
                 pilka.acc.y = -pilka.acc.y
             acc = Vector2(-(pilka.x-512),-(pilka.y-400)) #wektor przyspieszneia
             angle = acc.angle_to(Vector2(-1, 0)) #kąt między wektorem przyspieszenia a osią ox
-            pilka.movement() #aktualizacja położenia piłki
             angleSpeed = pozycja.angle_to(Vector2(1, 0)) ##kąt między osią ox a linią mocy(prędkosci)
-            speed(power, vel) #manipulacja wektorem predkosci
-
+            speed() #manipulacja wektorem predkosci
+            pilka.movement() #aktualizacja położenia piłki
+planeta()
+fps = 0
 while True:
     delta+= clock.tick()/1000.0
-    planeta()
     pygame.display.update()
-    pos = pygame.mouse.get_pos()
 
     while delta > 1/tickrate: ## tyknięcia programu
         delta -= 1/tickrate
+        print(fps)
+        pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                start_pos = pos;
+                start_pos = pos
                 pilka = Cialo(win, pos[0], pos[1], 10) #tworze obiekt
                 click = True
                 clockwise = False
