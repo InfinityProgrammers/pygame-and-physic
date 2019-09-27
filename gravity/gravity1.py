@@ -27,39 +27,41 @@ pygame.init()
 
 class Orb(object):
 
-    def __init__(self, speed, x, y, radius):
-        self.speed = speed
+    def __init__(self, win, x, y, radius,dispayVectors):
+        self.win = win
         self.x = x
         self.y = y
         self.radius = radius
         self.vel = Vector2()
         self.acc = Vector2()
+        self.dVec = dispayVectors
 
-    def Draw(self, win): #drawing ball
-        pygame.draw.circle(win, (255, 100, 100), (int(self.x), int(self.y)), self.radius)
-        pygame.draw.circle(win, (0, 100, 0), (int(self.x), int(self.y)), self.radius-2)
+    def Draw(self): #drawing ball
+        pygame.draw.circle(self.win, (255, 100, 100), (int(self.x), int(self.y)), self.radius)
+        pygame.draw.circle(self.win, (0, 100, 0), (int(self.x), int(self.y)), self.radius-2)
+        if self.dVec:
+            self.drawacc()
+            self.drawspeed(self.vel.x + vel.x, self.vel.y-vel.y)
+
     def movement(self): #ball movement
         self.vel += self.acc
         self.x += self.vel.x
         self.y += self.vel.y
 
+    def drawacc(self): #drawing accelerate
+        pygame.draw.line(self.win, (255, 0, 0),(int(self.x), int(self.y)), ((self.acc.x*600+self.x),(self.acc.y*600+self.y)), 2)
+
+    def drawspeed(self, xx, yy): #drawing velocity
+        pygame.draw.line(self.win, (50, 50, 255),(self.x,self.y), (xx*60/2+self.x, yy*60/2+self.y), 2)
+
 
 def redraw(): #aktualizacja ekranu co tick
     win.fill((0, 0, 0))
     pygame.draw.circle(win, (0, 128, 0), c.PLANET_POS, c.PLANET_SIZE) #draw planet
-    ball.Draw(win)
-    if click and space:
-        drawacc(ball.x, ball.y, ball.acc.x, ball.acc.y)
-        drawspeed(ball.x, ball.y, ball.vel.x + vel.x, ball.vel.y-vel.y)
+    ball.Draw()
     
 def line(pos): #drawing line
     pygame.draw.line(win, (255, 255, 255), [ball.x, ball.y], pos, 3)
-
-def drawacc(x, y, xx, yy): #drawing accelerate
-    pygame.draw.line(win, (255, 0, 0),(int(x), int(y)), ((xx*600+x),(yy*600+y)), 2)
-
-def drawspeed(x, y, xx, yy): #drawing velocity
-    pygame.draw.line(win, (50, 50, 255),(x, y), (xx*60/2+x, yy*60/2+y), 2)
 
 def planeta(): #planet variables
     global mass_p
@@ -110,7 +112,7 @@ while True:
                 sys.exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 start_pos = pos
-                ball = Orb(win, pos[0], pos[1], c.ORB_SIZE) #tworze obiekt
+                ball = Orb(win, pos[0], pos[1], c.ORB_SIZE, True) #tworze obiekt
                 click = True
                 clockwise = False
                 counterclockwise = False
