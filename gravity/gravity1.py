@@ -32,7 +32,7 @@ class Cialo(object):
         self.vel = Vector2()
         self.acc = Vector2()
 
-    def Draw(self, win): #rysuje pilke
+    def Draw(self, win): #drawing pilke
         pygame.draw.circle(win, (255, 100, 100), (int(self.x), int(self.y)), self.radius)
         pygame.draw.circle(win, (0, 100, 0), (int(self.x), int(self.y)), self.radius-2)
     def movement(self): #ruch pilki
@@ -46,21 +46,22 @@ def redraw(): #aktualizacja ekranu co tick
     pilka.Draw(win)
     drawacc(pilka.x, pilka.y, pilka.acc.x, pilka.acc.y)
     drawspeed(pilka.x, pilka.y, pilka.vel.x, pilka.vel.y)
-def line(pos): #rysuje linie
+    
+def line(pos): #drawing line
     pygame.draw.line(win, (255, 255, 255), [pilka.x, pilka.y], pos, 3)
 
-def planeta(): #zmienne planety
-    pygame.draw.circle(win, (0, 128, 0), (512, 400), 100)
-    global mass_p
-    mass_p = 5.972 * 10 ** 19
-
-def drawacc(x, y, xx, yy): #rysuje przyspiesznie
+def drawacc(x, y, xx, yy): #drawing accelerate
     if click and space:
         pygame.draw.line(win, (255, 0, 0),(int(x), int(y)), ((xx*1000+pilka.x),(yy*1000+pilka.y)), 2)
 
-def drawspeed(x, y, xx, yy): #rysuje predkosc
+def drawspeed(x, y, xx, yy): #drawing velocity
     if click and space:
         pygame.draw.line(win, (255, 255, 255),(x, y), (xx*8+x, yy*8+y), 2)
+
+def planeta(): #planet variables
+    pygame.draw.circle(win, (0, 128, 0), (512, 400), 100)
+    global mass_p
+    mass_p = 5.972 * 10 ** 19
 
 def speed(power, vel): #manipulacja wektorem predkosci
     angle4 = angleSpeed #kopiuje zmienną
@@ -96,30 +97,31 @@ while True:
     delta+= clock.tick()/1000.0
     planeta()
     pygame.display.update()
+    pos = pygame.mouse.get_pos()
+
     while delta > 1/tickrate: ## tyknięcia programu
         delta -= 1/tickrate
-        Force()
-        if click == True: ## klikniecie = rysuj obiekt ponownie
-            redraw()
-            if space == False: ## rysowanie lini
-                pos = pygame.mouse.get_pos()
-                line(pos)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                posss = pygame.mouse.get_pos()
-                pilka = Cialo(win, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], 10) #tworze obiekt
+                start_pos = pos;
+                pilka = Cialo(win, pos[0], pos[1], 10) #tworze obiekt
                 click = True
                 clockwise = False
                 counterclockwise = False
                 space = False
                 check = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and space == False:
-                poss = pygame.mouse.get_pos()
-                poz.x = poss[0]
-                poz.y = poss[1]
-                power = math.sqrt((poss[0] - pilka.x) ** 2 + (poss[1] - pilka.y) ** 2)/16 #liczę moc obliczając długosc wektora
-                pozycja = Vector2((poz.x-posss[0]), (poz.y-posss[1])) #wektor prędkosci
+                poz.x = pos[0]
+                poz.y = pos[1]
+                power = math.sqrt((pos[0] - pilka.x) ** 2 + (pos[1] - pilka.y) ** 2)/16 #liczę moc obliczając długosc wektora
+                pozycja = Vector2((poz.x-start_pos[0]), (poz.y-start_pos[1])) #wektor prędkosci
                 space = True
+        Force()
+        if click == True: ## klikniecie = rysuj obiekt ponownie
+            redraw()
+            if space == False: ## rysowanie lini
+                line(pos)
+
 
