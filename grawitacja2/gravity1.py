@@ -5,9 +5,9 @@ win = pygame.display.set_mode((1024, 800))
 click = False
 clock = pygame.time.Clock()
 delta = 0
-tickrate = 30
+tickrate = 60
 space = False
-G = 6.674 * 10 ** (-16)
+G = 6.674 * 10 ** (-17)
 poz = Vector2()
 power = 0
 vel = Vector2()
@@ -37,7 +37,7 @@ class Cialo(object):
 def redraw(): #aktualizacja ekranu co tick
     win.fill((0, 0, 0))
     pilka.Draw(win)
-    drawacc(pilka.x, pilka.y)
+    drawacc(pilka.x, pilka.y, pilka.acc.x, pilka.acc.y)
     drawspeed(pilka.x, pilka.y, pilka.vel.x, pilka.vel.y)
 def line(pos): #rysuje linie
     pygame.draw.line(win, (255, 255, 255), [pilka.x, pilka.y], pos, 3)
@@ -47,24 +47,23 @@ def planeta(): #zmienne planety
     global mass_p
     mass_p = 5.972 * 10 ** 19
 
-def drawacc(x, y): #rysuje przyspiesznie
+def drawacc(x, y, xx, yy): #rysuje przyspiesznie
     if click and space:
-        pygame.draw.line(win, (255, 0, 0),(int(x), int(y)), (512, 400), 2)
+        pygame.draw.line(win, (255, 0, 0),(int(x), int(y)), ((xx*1000+pilka.x),(yy*1000+pilka.y)), 2)
 
 def drawspeed(x, y, xx, yy): #rysuje predkosc
     if click and space:
-        poz.x += xx+vel.x
-        poz.y += yy-vel.y
-        pygame.draw.line(win, (255, 255, 255), (int(x),int(y)), poz, 2)
+        pygame.draw.line(win, (255, 255, 255),(x, y), (xx*8+x, yy*8+y), 2)
 
 def speed(power, vel): #manipulacja wektorem predkosci
     angle4 = angleSpeed #kopiuje zmienną
+    print(angleSpeed)
     angle4 = math.radians(angle4)
-    vel.x = round(power * math.cos(angle4) / 2)
-    vel.y = round(power * math.sin(angle4) / 2)
+    vel.x = round(power * math.cos(angle4) / 3)
+    vel.y = round(power * math.sin(angle4) / 3)
     pilka.x += vel.x
     pilka.y -= vel.y
-
+    print(pilka.vel)
 
 def Force(): #generowanie siły grawitacji
     if click and space:
