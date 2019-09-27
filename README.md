@@ -1,4 +1,4 @@
-# What is it?
+# What is this?
 Experimentation and  fun with pygame. We are trying to imitate various physics phenomenon with python, pygame and Git learning
 # Instructions
 To run it you need Python with pygame module installed
