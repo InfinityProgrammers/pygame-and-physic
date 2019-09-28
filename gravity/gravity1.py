@@ -1,10 +1,7 @@
 import pygame, sys, math
 import config
+from config import *
 from pygame.math import Vector2
-
- ### wszystkie zmienne
-
-c = config
 
 clock = pygame.time.Clock()
 delta = 0
@@ -13,121 +10,122 @@ tickrate = 60
 click = False
 space = False
 
-G = c.G_CONST
+G = G_CONST
 power = 0
 angleSpeed = 0
 
-poz = Vector2()
 vel = Vector2()
-pozycja = Vector2()
+dPosition = Vector2()
 
-win = pygame.display.set_mode(c.WIN_SIZE)
+win = pygame.display.set_mode(WIN_SIZE)
 pygame.init()
 
-
-class Orb(object):
-
-    def __init__(self, win, x, y, radius,dispayVectors):
+class Body(object):
+    def __init__(self, win, x, y, mass, st = True):
         self.win = win
         self.x = x
         self.y = y
+        self.mass = mass
+        self.isStatic = st
+
+class Planet(Body):
+
+    def __init__ (self, win, x, y, mass, radius, color = (255,255,255), st = True):
+        super().__init__(win,x,y,mass,st)
         self.radius = radius
+        self.color = color
+
+    def Draw(self):
+        pygame.draw.circle(self.win, self.color, (int(self.x), int(self.y)), self.radius)
+
+
+class Orb(Planet):
+
+    def __init__(self, win, x, y, mass, radius, color = (255,255,255), dispayVectors=False,st=False):
+        super().__init__(win, x, y, mass, radius, color,st)
         self.vel = Vector2()
-        self.acc = Vector2()
         self.dVec = dispayVectors
 
     def Draw(self): #drawing ball
-        pygame.draw.circle(self.win, (255, 100, 100), (int(self.x), int(self.y)), self.radius)
+        super().Draw()
         pygame.draw.circle(self.win, (0, 100, 0), (int(self.x), int(self.y)), self.radius-2)
         if self.dVec:
-            self.drawacc()
-            self.drawspeed(self.vel.x + vel.x, self.vel.y-vel.y)
+            if DRAW_ACC_VEC:
+                self.drawacc()
+            if DRAW_S_VEC:
+                self.drawspeed()
+
+    def drawacc(self): #drawing accelerate
+        i=0#pygame.draw.line(self.win, (255, 0, 0),(int(self.x), int(self.y)), ((self.acc.x*ACC_VECTOR_SCALE+self.x),(self.acc.y*ACC_VECTOR_SCALE+self.y)), 2)
+
+    def drawspeed(self): #drawing velocity
+        pygame.draw.line(self.win, (50, 50, 255),(self.x,self.y), (self.vel.x*SPEED_VECTOR_SCALE+self.x, self.vel.y*SPEED_VECTOR_SCALE+self.y), 2)
 
     def movement(self): #ball movement
-        self.vel += self.acc
         self.x += self.vel.x
         self.y += self.vel.y
 
-    def drawacc(self): #drawing accelerate
-        pygame.draw.line(self.win, (255, 0, 0),(int(self.x), int(self.y)), ((self.acc.x*600+self.x),(self.acc.y*600+self.y)), 2)
-
-    def drawspeed(self, xx, yy): #drawing velocity
-        pygame.draw.line(self.win, (50, 50, 255),(self.x,self.y), (xx*60/2+self.x, yy*60/2+self.y), 2)
-
-
-def redraw(): #aktualizacja ekranu co tick
+def redraw():
     win.fill((0, 0, 0))
-    pygame.draw.circle(win, (0, 128, 0), c.PLANET_POS, c.PLANET_SIZE) #draw planet
+    planet1.Draw() #draw planet
     ball.Draw()
     
 def line(pos): #drawing line
     pygame.draw.line(win, (255, 255, 255), [ball.x, ball.y], pos, 3)
 
-def planeta(): #planet variables
-    global mass_p
-    mass_p = c.PLANET_MASS
-    pygame.draw.circle(win, (0, 128, 0),c.PLANET_POS, c.PLANET_SIZE)
+def DeltaVector(pos1,pos2,scale):
+    vec = Vector2(0,0)
+    distanceX = pos2.x - pos1.x
+    distanceY = pos2.y - pos1.y
+    distance = math.sqrt(distanceX**2+distanceY**2)
+    if distance != 0:
+        Sum = scale / distance**2
+        vec.x = Sum*distanceX/distance
+        vec.y = Sum*distanceY/distance
+        print(scale)
+        print(distance)
+    return vec
 
-def speed(): #manipulacja wektorem predkosci
-    angle4 = angleSpeed #kopiuje zmienną
-    print(angleSpeed)
-    angle4 = math.radians(angle4)
-    vel.x = round(power * math.cos(angle4) / 3)
-    vel.y = round(power * math.sin(angle4) / 3)
-    ball.x += vel.x
-    ball.y -= vel.y
-    print(ball.vel)
+def Gravity(object1,object2): #creating gravity force
+    acc = DeltaVector(Vector2(object1.x,object1.y),Vector2(object2.x,object2.y),G * object1.mass * object2.mass)
+    if not object1.isStatic:
+        object1.vel.x = acc.x
+        object1.vel.y = acc.y
+        object1.movement()
+    if not object2.isStatic:
+        object2.vel.x += -acc.x
+        object2.vel.y += -acc.y
+        object2.movement()
 
-def Force(): #generowanie siły grawitacji
-    if click and space:
-        global angleSpeed
-        distancex = ball.x-c.PLANET_POS[0]
-        distancey = ball.y-c.PLANET_POS[1]
-        distance = math.sqrt(distancex**2+distancey**2)
-        if distance != 0:
-            sumaccel = G*mass_p/distance**2
-            ball.acc.x = abs(sumaccel*distancex/distance)
-            ball.acc.y = abs(sumaccel*distancey/distance)
-            if distancex > 0:
-                ball.acc.x = -ball.acc.x
-            if distancey > 0:
-                ball.acc.y = -ball.acc.y
-            acc = Vector2(-(ball.x-c.PLANET_POS[0]),-(ball.y-c.PLANET_POS[1])) #wektor przyspieszneia
-            angle = acc.angle_to(Vector2(-1, 0)) #kąt między wektorem przyspieszenia a osią ox
-            angleSpeed = pozycja.angle_to(Vector2(1, 0)) ##kąt między osią ox a linią mocy(prędkosci)
-            speed() #manipulacja wektorem predkosci
-            ball.movement() #aktualizacja położenia piłki
-planeta()
-fps = 0
+planet1 = Planet(win,PLANET_POS.x,PLANET_POS.y,PLANET_MASS,PLANET_SIZE,PLANET_COLOR)
+planet1.Draw()
+
 while True:
     delta+= clock.tick()/1000.0
     pygame.display.update()
 
-    while delta > 1/tickrate: ## tyknięcia programu
+    while delta > 1/tickrate:
+
         delta -= 1/tickrate
-        print(fps)
-        pos = pygame.mouse.get_pos()
+        m_pos = Vector2 (pygame.mouse.get_pos())
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                start_pos = pos
-                ball = Orb(win, pos[0], pos[1], c.ORB_SIZE, True) #tworze obiekt
+                start_pos = m_pos
+                ball = Orb(win, m_pos.x, m_pos.y, 1, ORB_SIZE,ORB_COLOR, True)
                 click = True
-                clockwise = False
-                counterclockwise = False
                 space = False
-                check = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and space == False:
-                poz.x = pos[0]
-                poz.y = pos[1]
-                power = math.sqrt((pos[0] - ball.x) ** 2 + (pos[1] - ball.y) ** 2)/16 #liczę moc obliczając długosc wektora
-                pozycja = Vector2((poz.x-start_pos[0]), (poz.y-start_pos[1])) #wektor prędkosci
+                #ball.vel = DeltaVector(Vector2(ball.x,ball.y),Vector2(m_pos.x,m_pos.y),ball.mass*POWER_SCALE)
                 space = True
-        Force()
-        if click == True: ## klikniecie = rysuj obiekt ponownie
+
+        if click:
             redraw()
-            if space == False: ## rysowanie lini
-                line(pos)
+            if not space:
+                line(m_pos)
+            else:
+                Gravity(ball,planet1)
+
 
 
