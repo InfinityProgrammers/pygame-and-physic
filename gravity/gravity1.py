@@ -69,8 +69,7 @@ class Orb(Planet):
 
 def redraw(): #TODO list of elements to draw
     win.fill((0, 0, 0))
-    planet1.Draw() #draw planet
-    planet2.Draw()
+    orb.Draw()
     ball.Draw()
     
 def line(pos): #drawing line
@@ -99,10 +98,8 @@ def Gravity(object1,object2): #creating gravity force
         object2.vel.y += -acc.y
         object2.movement()
 
-planet1 = Planet(win,PLANET_POS.x,PLANET_POS.y,PLANET_MASS,PLANET_SIZE,PLANET_COLOR)
-planet1.Draw()
-planet2 = Planet(win,PLANET_POS.x+700,PLANET_POS.y,PLANET_MASS*3/2,PLANET_SIZE*3/2,PLANET_COLOR)
-planet2.Draw()
+orb = Orb(win,800,400,ORB_MASS,ORB_SIZE,ORB_COLOR,True)
+orb.Draw()
 
 while True:
     delta+= clock.tick()/1000.0
@@ -129,8 +126,7 @@ while True:
             if not space:
                 line(m_pos)
             else:
-                Gravity(ball,planet1)
-                Gravity(ball,planet2)
+                Gravity(ball,orb)
 
 
 
