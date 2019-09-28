@@ -1,14 +1,15 @@
 import pygame, sys, math
 import config
+from config import *
 from pygame.math import Vector2
 
-win = pygame.display.set_mode((800, 400))
-
-class pilka(object):
+win = pygame.display.set_mode(WIN_SIZE)
+#TODO: recode this bcs is awful
+class ball(object):
     def __init__(self, x, y, radius, color):
         self.clock = pygame.time.Clock()
         self.delta = 0
-        self.tickrate = 120
+        self.tickrate = TICK_RATE
         self.x = x
         self.y = y
         self.radius = radius
@@ -19,15 +20,15 @@ class pilka(object):
         pygame.draw.circle(win, self.color, (int(self.x), int(self.y)), self.radius-1)
 
 def redrawwindow():
-    win.fill((0, 150, 150))
+    win.fill(WIN_COLOR)
     golfball.Draw(win)
     pygame.draw.line(win, (0, 0, 0), line[0], line[1])
     pygame.display.update()
 
-golfball = pilka(400, 394, 6, (255, 255, 255))
+golfball = ball(WIN_SIZE[0]/2, WIN_SIZE[1]-BALL_RADIUS, BALL_RADIUS, BALL_COLOR)
 bound = False
 shoot = False
-gravacc = 0.04
+gravacc = GRAV_ACC
 vel = Vector2(0, 0)
 
 while True:
@@ -41,16 +42,16 @@ while True:
             vel.y += gravacc
             golfball.x += vel.x
             golfball.y += vel.y
-            if golfball.y > 394 or golfball.y < 6:
-                vel.x /= 1.2
-                vel.y /= -1.3
-                golfball.y = 6 if golfball.y<6 else 394
+            if golfball.y > WIN_SIZE[1]-BALL_RADIUS or golfball.y < BALL_RADIUS:
+                vel.x /= SD_X
+                vel.y /= -SD_Y
+                golfball.y = BALL_RADIUS if golfball.y<BALL_RADIUS else WIN_SIZE[1]-BALL_RADIUS
                 if abs(vel.x) < 0.1 and abs(vel.y) < 0.1:
-                    golfball.y = 394
+                    golfball.y = WIN_SIZE[1]-BALL_RADIUS
                     shoot = False
-            if golfball.x < 6 or golfball.x > 794:
-                vel.x /= -1.2
-                golfball.x = 6 if golfball.x<6 else 794
+            if golfball.x < BALL_RADIUS or golfball.x > WIN_SIZE[0]-BALL_RADIUS:
+                vel.x /= -SD_X
+                golfball.x = BALL_RADIUS if golfball.x<BALL_RADIUS else WIN_SIZE[0]-BALL_RADIUS
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit(0)
@@ -61,5 +62,5 @@ while True:
                 poss = Vector2(posss[0] - golfball.x, posss[1] - golfball.y)
                 power = math.sqrt((golfball.x-posss[0])**2+(golfball.y-posss[1])**2)/3
                 angle = poss.angle_to(Vector2(1, 0))
-                vel.x = round(math.cos(math.radians(angle)) * power) / 12
-                vel.y = -round(math.sin(math.radians(angle)) * power) / 12
+                vel.x = round(math.cos(math.radians(angle)) * power) * POWER_SCALE
+                vel.y = -round(math.sin(math.radians(angle)) * power) * POWER_SCALE

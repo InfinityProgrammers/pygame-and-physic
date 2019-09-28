@@ -5,7 +5,7 @@ from pygame.math import Vector2
 
 clock = pygame.time.Clock()
 delta = 0
-tickrate = 60
+tickrate = TICK_RATE
 
 click = False
 space = False
@@ -117,7 +117,7 @@ while True:
                 sys.exit(0)
             if event.type == pygame.MOUSEBUTTONDOWN:
                 start_pos = m_pos
-                ball = Orb(win, m_pos.x, m_pos.y, 1, ORB_SIZE,ORB_COLOR, True)
+                ball = Orb(win, m_pos.x, m_pos.y, ORB_MASS, ORB_SIZE,ORB_COLOR, True)
                 click = True
                 space = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and space == False:
