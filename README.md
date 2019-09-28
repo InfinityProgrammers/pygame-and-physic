@@ -6,4 +6,4 @@ To run it you need Python with pygame module installed
 ### Ball
 Click mouse button to add force to ball and see physical and gravity magic ;)
 ### Gravity
-Dealing with custom force and planet gravity in space (mouse button - costom force, spacebar - gravity)
+Dealing with force and planet gravity in space (mouse button - create Orb, mouse + spacebar - start simulation with custom force)
