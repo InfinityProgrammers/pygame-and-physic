@@ -36,7 +36,7 @@ class Planet(Body):
         self.color = color
 
     def Draw(self):
-        pygame.draw.circle(self.win, self.color, (int(self.x), int(self.y)), self.radius)
+        pygame.draw.circle(self.win, self.color, (int(self.x), int(self.y)), int(self.radius))
 
 
 class Orb(Planet):
@@ -44,6 +44,7 @@ class Orb(Planet):
     def __init__(self, win, x, y, mass, radius, color = (255,255,255), dispayVectors=False,st=False):
         super().__init__(win, x, y, mass, radius, color,st)
         self.vel = Vector2()
+        self.p_vel = Vector2()
         self.dVec = dispayVectors
 
     def Draw(self): #drawing ball
@@ -52,11 +53,12 @@ class Orb(Planet):
         if self.dVec:
             if DRAW_ACC_VEC:
                 self.drawacc()
+                self.p_vel=Vector2(self.vel)
             if DRAW_S_VEC:
                 self.drawspeed()
 
     def drawacc(self): #drawing accelerate
-        i=0#pygame.draw.line(self.win, (255, 0, 0),(int(self.x), int(self.y)), ((self.acc.x*ACC_VECTOR_SCALE+self.x),(self.acc.y*ACC_VECTOR_SCALE+self.y)), 2)
+        pygame.draw.line(self.win, (255, 0, 0),(self.x, self.y), (self.x+(self.vel.x-self.p_vel.x)*ACC_VECTOR_SCALE, self.y+(self.vel.y-self.p_vel.y)*ACC_VECTOR_SCALE), 2)
 
     def drawspeed(self): #drawing velocity
         pygame.draw.line(self.win, (50, 50, 255),(self.x,self.y), (self.vel.x*SPEED_VECTOR_SCALE+self.x, self.vel.y*SPEED_VECTOR_SCALE+self.y), 2)
@@ -65,9 +67,10 @@ class Orb(Planet):
         self.x += self.vel.x
         self.y += self.vel.y
 
-def redraw():
+def redraw(): #TODO list of elements to draw
     win.fill((0, 0, 0))
     planet1.Draw() #draw planet
+    planet2.Draw()
     ball.Draw()
     
 def line(pos): #drawing line
@@ -82,15 +85,14 @@ def DeltaVector(pos1,pos2,scale):
         Sum = scale / distance**2
         vec.x = Sum*distanceX/distance
         vec.y = Sum*distanceY/distance
-        print(scale)
-        print(distance)
-    return vec
+        print(vec.x,vec.y)
+        return vec
 
 def Gravity(object1,object2): #creating gravity force
     acc = DeltaVector(Vector2(object1.x,object1.y),Vector2(object2.x,object2.y),G * object1.mass * object2.mass)
     if not object1.isStatic:
-        object1.vel.x = acc.x
-        object1.vel.y = acc.y
+        object1.vel.x += acc.x
+        object1.vel.y += acc.y
         object1.movement()
     if not object2.isStatic:
         object2.vel.x += -acc.x
@@ -99,6 +101,8 @@ def Gravity(object1,object2): #creating gravity force
 
 planet1 = Planet(win,PLANET_POS.x,PLANET_POS.y,PLANET_MASS,PLANET_SIZE,PLANET_COLOR)
 planet1.Draw()
+planet2 = Planet(win,PLANET_POS.x+700,PLANET_POS.y,PLANET_MASS*3/2,PLANET_SIZE*3/2,PLANET_COLOR)
+planet2.Draw()
 
 while True:
     delta+= clock.tick()/1000.0
@@ -117,7 +121,7 @@ while True:
                 click = True
                 space = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and space == False:
-                #ball.vel = DeltaVector(Vector2(ball.x,ball.y),Vector2(m_pos.x,m_pos.y),ball.mass*POWER_SCALE)
+                ball.vel = Vector2(m_pos.x-ball.x,m_pos.y-ball.y)*POWER_SCALE
                 space = True
 
         if click:
@@ -126,6 +130,7 @@ while True:
                 line(m_pos)
             else:
                 Gravity(ball,planet1)
+                Gravity(ball,planet2)
 
 
 

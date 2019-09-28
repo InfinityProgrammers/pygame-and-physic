@@ -1,7 +1,7 @@
 import pygame
 from pygame.math import Vector2
 
-WIN_SIZE = (1024,800)
+WIN_SIZE = (1600,800)
 
 G_CONST = 6.674 * 10 ** (-17)
 
@@ -15,7 +15,7 @@ ORB_COLOR = (255, 100, 100)
 
 DRAW_S_VEC = True
 DRAW_ACC_VEC = True
-SPEED_VECTOR_SCALE = 30
-ACC_VECTOR_SCALE = 600
+SPEED_VECTOR_SCALE = 20
+ACC_VECTOR_SCALE = 20*20
 
-POWER_SCALE = 10
+POWER_SCALE = 1/30
