@@ -14,7 +14,6 @@ G = G_CONST
 power = 0
 angleSpeed = 0
 
-vel = Vector2()
 dPosition = Vector2()
 stars=[]
 win = pygame.display.set_mode(WIN_SIZE)
@@ -45,6 +44,7 @@ class Orb(Planet):
         self.vel = Vector2(0,0)
         self.p_vel = Vector2(0,0)
         self.dVec = dispayVectors
+        self.forceW = Vector2(0,0)
 
     def Draw(self): #drawing ball
         super().Draw()
@@ -59,18 +59,20 @@ class Orb(Planet):
     def drawacc(self): #drawing accelerate
         pygame.draw.line(self.win, (255, 0, 0),self.pos, (self.vel-self.p_vel)*ACC_VECTOR_SCALE + self.pos, 2)
     def drawspeed(self): #drawing velocity
-        pygame.draw.line(self.win, (50, 50, 255),self.pos, self.vel * SPEED_VECTOR_SCALE + self.pos, 2)
+        pygame.draw.line(self.win, (50, 50, 255),self.pos, self.vel*60 + self.pos, 2)
 
     def movement(self): #ball movement
-        self.pos += self.vel/self.mass*VEL_SCALE
+        self.vel += self.forceW/self.mass*VEL_SCALE 
+        self.pos += self.vel
 
     def Fuze(self, obj):
         self.vel = (self.vel*self.mass + obj.vel*obj.mass)/(self.mass + obj.mass)
         self.mass += obj.mass
+        self.forceW += obj.forceW
         self.pos += (obj.pos - self.pos)/(1+((self.radius/obj.radius)**2))
         self.radius = math.sqrt(self.radius**2+obj.radius**2)
 
-def redraw(): #TODO list of elements to draw
+def redraw():
     win.fill((0, 0, 0))
     for obj in stars:
         obj.Draw()
@@ -91,11 +93,11 @@ def DeltaVector(pos1,pos2,scale):
     
 
 def Gravity(object1,object2): #creating gravity force
-    acc = DeltaVector(object1.pos,object2.pos,G * object1.mass * object2.mass)
+    F = DeltaVector(object1.pos,object2.pos,G * object1.mass * object2.mass)
     if not object1.isStatic:
-        object1.vel += acc
+        object1.forceW += F
     if not object2.isStatic:
-        object2.vel -= acc
+        object2.forceW -= F
 
 
 while True:
@@ -116,7 +118,7 @@ while True:
                 click = True
                 space = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and space == False:
-                ball.vel = Vector2(m_pos.x-ball.pos.x,m_pos.y-ball.pos.y)*POWER_SCALE/ball.mass
+                ball.vel = (m_pos-ball.pos) * POWER_SCALE / 60
                 space = True
 
         if click:
@@ -137,6 +139,8 @@ while True:
                         elif object1.pos.distance_to(object2.pos) < max(object1.radius,object2.radius):
                             object1.Fuze(object2)
                             stars.remove(object2)
+                for obj in stars:
+                    obj.forceW*=0
 
 
 
